@@ -1,0 +1,12 @@
+[package]
+name = "bayesian_bm25"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "bayesian_bm25"
+path = "src/lib.rs"
+
+[[bin]]
+name = "run_experiments"
+path = "src/main.rs"
