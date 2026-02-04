@@ -7,7 +7,7 @@ The Python import name is `bb25`.
 ## Minimal Flow
 
 1) Install a Pyodide build toolchain (pyodide-build + Emscripten).
-2) From `bayesian_bm25_rs/`, run:
+2) From the repo root, run:
 
 ```
 ./scripts/build_pyodide.sh

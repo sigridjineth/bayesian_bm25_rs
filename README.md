@@ -2,13 +2,13 @@
 
 bb25 is a fast, self-contained BM25 + Bayesian calibration implementation with a minimal Python API. It also includes a small reference corpus and experiment suite so you can validate the expected numerical properties.
 
-- PyPI package name: `bayesian_bm25_rs`
+- PyPI package name: `bb25`
 - Python import name: `bb25`
 
 ## Install
 
 ```
-pip install bayesian_bm25_rs
+pip install bb25
 ```
 
 ## Quick start
@@ -69,6 +69,10 @@ import bb25 as bb
 results = bb.run_experiments()
 print(all(r.passed for r in results))
 ```
+
+## Sample script
+
+See `docs/sample_usage.py` for an end-to-end example using BM25, Bayesian calibration, and hybrid fusion.
 
 ## Build from source (Rust)
 
