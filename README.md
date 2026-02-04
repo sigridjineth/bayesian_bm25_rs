@@ -16,7 +16,7 @@ Expected output: 10 experiments with PASS/FAIL and supporting details. All shoul
 
 For Python, the extension module name is `bayesian_bm25` (distribution name `bayesian_bm25_rs`).
 
-### Python (PyO3)
+### Python (PyO3, native)
 
 Build and install locally with maturin:
 
@@ -29,7 +29,17 @@ maturin develop
 Smoke test:
 
 ```
-python -c "import bayesian_bm25 as bb; print(len(bb.run_experiments()))"
+python - <<'PY'
+import bayesian_bm25 as bb
+corpus = bb.build_default_corpus()
+docs = corpus.documents()
+queries = bb.build_default_queries()
+scorer = bb.BM25Scorer(corpus, 1.2, 0.75)
+score = scorer.score(queries[0].terms, docs[0])
+print("docs", len(docs))
+print("query", queries[0].text)
+print("score0", score)
+PY
 ```
 
 If your Python version is newer than the PyO3 version supports, set:
@@ -38,19 +48,70 @@ If your Python version is newer than the PyO3 version supports, set:
 PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1
 ```
 
-### Pyodide / WASM (outline)
+### Pyodide / WASM (tested)
 
-This project is designed to support a Pyodide build, but the exact build steps depend on your Pyodide toolchain and target environment. The binding layer avoids file I/O and uses only basic Python types, which keeps the API Pyodide-friendly.
+This project supports Pyodide builds. The binding layer avoids file I/O and uses only basic Python types, which keeps the API Pyodide-friendly.
 
-If you are using `pyodide-build`, the typical flow is:
+The following sequence was tested locally on macOS:
 
-1) Install the Pyodide build toolchain.
-2) Build the package from `pyproject.toml`.
-3) Load the resulting wheel in your Pyodide runtime.
+1) Install pyodide-build and the cross-build env:
 
-If you prefer a direct Rust build, ensure a WASM toolchain is installed and then build a wheel for the `wasm32-unknown-emscripten` target using maturin.
+```
+python -m pip install pyodide-build
+pyodide xbuildenv install
+pyodide xbuildenv install-emscripten
+```
 
-See `docs/pyodide.md` and `scripts/build_pyodide.sh` for a minimal scaffold.
+2) Ensure the Pyodide Rust toolchain is available:
+
+```
+rustup toolchain install nightly-2025-02-01
+rustup target add wasm32-unknown-emscripten --toolchain nightly-2025-02-01
+```
+
+3) Install the Pyodide wasm-eh sysroot (required to avoid dynamic linking errors like `invoke_iiii`):
+
+```
+curl -L -o /tmp/emcc-4.0.9_nightly-2025-02-01.tar.bz2 \
+  https://github.com/pyodide/rust-emscripten-wasm-eh-sysroot/releases/download/emcc-4.0.9_nightly-2025-02-01/emcc-4.0.9_nightly-2025-02-01.tar.bz2
+mkdir -p /tmp/emscripten-sysroot
+tar -xjf /tmp/emcc-4.0.9_nightly-2025-02-01.tar.bz2 -C /tmp/emscripten-sysroot
+rsync -a /tmp/emscripten-sysroot/wasm32-unknown-emscripten/ \
+  ~/.rustup/toolchains/nightly-2025-02-01-$(rustc -vV | awk '/^host:/ {print $2}')/lib/rustlib/wasm32-unknown-emscripten/
+```
+
+4) Build the wheel:
+
+```
+cd bayesian_bm25_rs
+TOOLCHAIN_BIN="$HOME/.rustup/toolchains/nightly-2025-02-01-$(rustc -vV | awk '/^host:/ {print $2}')/bin"
+EMSDK_DIR="$PWD/.pyodide-xbuildenv-0.32.0/0.29.3/emsdk"
+PATH="$TOOLCHAIN_BIN:$EMSDK_DIR:$EMSDK_DIR/upstream/emscripten:$PATH" \
+RUSTC="$TOOLCHAIN_BIN/rustc" \
+CARGO="$TOOLCHAIN_BIN/cargo" \
+CARGO_HOME="$PWD/.cargo" \
+RUSTFLAGS="-C link-arg=-sSIDE_MODULE=2 -Z link-native-libraries=yes -Z emscripten-wasm-eh" \
+PYODIDE_XBUILDENV_PATH="$PWD/.pyodide-xbuildenv-0.32.0" \
+CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER="/usr/bin/cc" \
+pyodide build -o dist
+```
+
+5) Test in a Pyodide venv:
+
+```
+pyodide venv .pyodide-venv --clear --extra-search-dir dist
+.pyodide-venv/bin/pip install dist/bayesian_bm25_rs-0.1.0-cp313-cp313-pyodide_2025_0_wasm32.whl
+.pyodide-venv/bin/python - <<'PY'
+import bayesian_bm25 as bb
+corpus = bb.build_default_corpus()
+docs = corpus.documents()
+queries = bb.build_default_queries()
+scorer = bb.BM25Scorer(corpus, 1.2, 0.75)
+print("score0", scorer.score(queries[0].terms, docs[0]))
+PY
+```
+
+If you hit toolchain errors, see `docs/pyodide.md` for notes.
 
 ## Scope and Validation Goals
 
@@ -158,4 +219,4 @@ where p = sigmoid(alpha * (s - beta))
 ## Requirements
 
 - Rust toolchain (edition 2021)
-- No external crates
+- Optional Python bindings use PyO3 (enabled via feature `python`)
