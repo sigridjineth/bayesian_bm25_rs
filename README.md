@@ -2,9 +2,6 @@
 
 bb25 is a fast, self-contained BM25 + Bayesian calibration implementation with a minimal Python API. It also includes a small reference corpus and experiment suite so you can validate the expected numerical properties.
 
-- PyPI package name: `bb25`
-- Python import name: `bb25`
-
 ## Install
 
 ```
@@ -77,6 +74,28 @@ See `docs/sample_usage.py` for an end-to-end example using BM25, Bayesian calibr
 ## Benchmarks (BM25 vs Bayesian)
 
 See `benchmarks/README.md` for a lightweight runner that compares BM25 and Bayesian BM25 on your own corpora.
+
+## English Benchmark (SQuAD, 100 validation queries)
+
+This is where BB25 shines: Bayesian Hybrid beats the classic BM25 Hybrid.
+
+| Method               | NDCG@10       | MRR@10   | Notes                                |
+| -------------------- | ------------ | -------- | ------------------------------------ |
+| **WS (BB25+Dense)**  | **0.9149** | **0.8850** | **SOTA!**                |
+| WS (BM25+Dense)      | 0.9051       | 0.8717   |                                      |
+| RRF (BM25+Dense)     | 0.8874       | 0.8483   | RRF underperforms weighted sum       |
+
+# Conclusion
+
+"Bayesian BM25 (bb25) has demonstrated the potential to outperform classic BM25 in hybrid search."
+
+On the English dataset (SQuAD), combining bb25 with Dense (BGE-M3) achieves higher performance than the BM25 + Dense baseline (+1.0%p NDCG). This suggests the probabilistic score from bb25 blends more smoothly with vector scores (less scale mismatch than a simple weighted sum).
+
+Original paper:
+
+```
+https://www.researchgate.net/publication/400212695_Bayesian_BM25_A_Probabilistic_Framework_for_Hybrid_Text_and_Vector_Search
+```
 
 ## Build from source (Rust)
 
