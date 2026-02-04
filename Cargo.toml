@@ -13,7 +13,7 @@ name = "run_experiments"
 path = "src/main.rs"
 
 [dependencies]
-pyo3 = { version = "0.21", optional = true, features = ["extension-module"] }
+pyo3 = { version = "0.28", optional = true, features = ["extension-module"] }
 
 [features]
 python = ["pyo3"]

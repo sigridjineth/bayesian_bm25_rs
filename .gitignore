@@ -17,5 +17,12 @@ __pycache__/
 /.venv/
 /venv/
 
+# Cargo cache
+/.cargo/
+
+# Pyodide build env
+/.pyodide-xbuildenv-*/
+/.pyodide-venv/
+
 # OS
 .DS_Store

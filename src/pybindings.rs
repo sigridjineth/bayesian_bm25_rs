@@ -464,7 +464,7 @@ impl PyExperimentRunner {
     fn new(corpus: &PyCorpus, queries: Vec<Py<PyQuery>>, k1: Option<f64>, b: Option<f64>) -> PyResult<Self> {
         let corpus = corpus.shared_corpus()?;
         let mut query_list = Vec::with_capacity(queries.len());
-        Python::with_gil(|py| {
+        Python::attach(|py| {
             for q in &queries {
                 let q_ref = q.borrow(py);
                 query_list.push(q_ref.clone_inner());
