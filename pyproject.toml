@@ -4,14 +4,14 @@ build-backend = "maturin"
 
 [project]
 name = "bayesian_bm25_rs"
-version = "0.1.0"
+version = "0.1.1"
 description = "Bayesian BM25 scoring and experimental validation (Rust core + Python bindings)"
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "UNLICENSED" }
 keywords = ["bm25", "information-retrieval", "search", "ranking", "bayesian", "hybrid-search"]
 classifiers = [
-  "License :: Other/Proprietary",
+  "License :: Other/Proprietary License",
   "Programming Language :: Rust",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
@@ -31,5 +31,5 @@ Issues = "https://github.com/sigridjineth/bayesian_bm25_rs/issues"
 
 [tool.maturin]
 bindings = "pyo3"
-module-name = "bayesian_bm25"
+module-name = "bb25"
 features = ["python"]

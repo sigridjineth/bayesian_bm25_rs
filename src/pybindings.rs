@@ -530,7 +530,7 @@ fn run_experiments_py() -> Vec<PyExperimentResult> {
 }
 
 #[pymodule]
-fn bayesian_bm25(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn bb25(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyTokenizer>()?;
     m.add_class::<PyDocument>()?;
     m.add_class::<PyCorpus>()?;

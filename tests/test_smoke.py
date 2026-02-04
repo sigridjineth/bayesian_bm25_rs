@@ -1,6 +1,6 @@
 import unittest
 
-import bayesian_bm25 as bb
+import bb25 as bb
 
 
 class SmokeTests(unittest.TestCase):
@@ -18,7 +18,7 @@ class SmokeTests(unittest.TestCase):
     def test_scoring(self):
         corpus = bb.build_default_corpus()
         doc = corpus.get_document("d01")
-        bm25 = bb.BM25Scorer(corpus)
+        bm25 = bb.BM25Scorer(corpus, 1.2, 0.75)
         bayes = bb.BayesianBM25Scorer(bm25)
         score = bayes.score(["machine", "learning"], doc)
         self.assertGreaterEqual(score, 0.0)

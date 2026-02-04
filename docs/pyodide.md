@@ -2,6 +2,8 @@
 
 This project targets Pyodide by keeping the Python API pure (no file I/O, no OS dependencies) and using PyO3 for bindings. The actual build depends on your Pyodide toolchain setup.
 
+The Python import name is `bb25`.
+
 ## Minimal Flow
 
 1) Install a Pyodide build toolchain (pyodide-build + Emscripten).
